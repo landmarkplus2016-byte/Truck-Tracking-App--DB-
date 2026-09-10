@@ -56,17 +56,14 @@ export function buildIndex(rows) {
   const bySite = new Map();
   let skipped = 0;
   list.forEach((row) => {
-    const key = String(row.site_jc === null || row.site_jc === undefined ? '' : row.site_jc).trim();
-    const cut = key.indexOf('-');
-    const siteId = cut > 0 ? normalizeSiteId(key.slice(0, cut)) : '';
-    const jobCode = cut > 0 ? key.slice(cut + 1).trim() : '';
-    if (!siteId || !jobCode) {
+    const parts = splitSiteJc(row.site_jc);
+    if (!parts) {
       skipped++;
       return;
     }
-    if (!bySite.has(siteId)) bySite.set(siteId, []);
-    bySite.get(siteId).push({
-      job_code: jobCode,
+    if (!bySite.has(parts.site_id)) bySite.set(parts.site_id, []);
+    bySite.get(parts.site_id).push({
+      job_code: parts.job_code,
       task_date: parseTypedDate(row.task_date),
       old_new: normalizePeriod(row.old_new),
       contractor: String(row.contractor === null || row.contractor === undefined ? '' : row.contractor).trim(),
@@ -75,6 +72,15 @@ export function buildIndex(rows) {
   });
   bySite.forEach((candidates) => candidates.sort(newestFirst));
   return { bySite, size: list.length - skipped, skipped };
+}
+
+/** 'SITE-JC' → {site_id, job_code}, split on the first hyphen; null if either part is missing. */
+export function splitSiteJc(value) {
+  const key = String(value === null || value === undefined ? '' : value).trim();
+  const cut = key.indexOf('-');
+  const siteId = cut > 0 ? normalizeSiteId(key.slice(0, cut)) : '';
+  const jobCode = cut > 0 ? key.slice(cut + 1).trim() : '';
+  return siteId && jobCode ? { site_id: siteId, job_code: jobCode } : null;
 }
 
 function newestFirst(a, b) {
@@ -184,7 +190,7 @@ export function isManual(flag) {
   return flag === true || String(flag).toLowerCase() === 'true';
 }
 
-function isConflictSet(value) {
+export function isConflictSet(value) {
   if (value === true) return true;
   return UNSET_CONFLICT.indexOf(String(value === null || value === undefined ? '' : value).trim().toLowerCase()) === -1;
 }

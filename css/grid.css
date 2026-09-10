@@ -1,0 +1,22 @@
+/*
+ * grid.css — tables. The shared table look now (the admin master sample); the
+ * coordinator grid's trip heads, editable cells and row states arrive in Stage 6.
+ */
+
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: start;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--muted);
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+td { padding: 10px 12px; border-bottom: 1px solid var(--border-2); vertical-align: middle; }
+tbody tr:hover { background: var(--surface-2); }
+.grid-wrap { overflow: auto; border-radius: var(--r-lg); }
+.site { font-weight: 700; }

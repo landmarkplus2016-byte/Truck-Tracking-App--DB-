@@ -112,12 +112,33 @@ function readColumn(name, key) {
 function appendObjects(name, objects) {
   if (!objects.length) return;
   const t = openTable_(name);
+  writeObjectsAt_(t, t.sheet.getLastRow() + 1, objects);
+}
+
+/**
+ * Replaces every data row with objects: one write over row 2 down, then any old rows
+ * left below are cleared. Row 1 (the headers) is kept.
+ */
+function replaceObjects(name, objects) {
+  const t = openTable_(name);
+  const oldLastRow = t.sheet.getLastRow();
+  if (objects.length) writeObjectsAt_(t, 2, objects);
+  const firstStale = objects.length + 2;
+  if (oldLastRow >= firstStale) {
+    t.sheet.getRange(firstStale, 1, oldLastRow - firstStale + 1, t.sheet.getLastColumn()).clearContent();
+  }
+}
+
+/** One write of objects starting at startRow, growing the sheet first if it is too short. */
+function writeObjectsAt_(t, startRow, objects) {
   const values = objects.map(function (o) {
     return t.headers.map(function (h) { return cellIn_(h, o[h]); });
   });
   const formats = objects.map(function () { return t.headers.map(columnFormat_); });
-  const range = t.sheet.getRange(t.sheet.getLastRow() + 1, 1, objects.length, t.headers.length);
-  range.setNumberFormats(formats).setValues(values);
+  const lastNeeded = startRow + objects.length - 1;
+  const maxRows = t.sheet.getMaxRows();
+  if (lastNeeded > maxRows) t.sheet.insertRowsAfter(maxRows, lastNeeded - maxRows);
+  t.sheet.getRange(startRow, 1, objects.length, t.headers.length).setNumberFormats(formats).setValues(values);
 }
 
 /** Overwrites only the given fields on one sheet row. */

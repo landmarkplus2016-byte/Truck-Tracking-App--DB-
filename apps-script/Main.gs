@@ -6,7 +6,7 @@
  * Response: {"ok": true, "data": ...}  or  {"ok": false, "error": "snake_case_code", "message": "..."}
  *
  * The app is open by design (CLAUDE.md rule 30): there is no session token.
- * Admin actions (Stage 5) check admin_pw_hash inside their own handlers.
+ * Admin actions check admin_pw_hash inside their own handlers (requireAdmin_ in Admin.gs).
  */
 
 // Handlers are wrapped so they resolve at call time, not when this file loads
@@ -15,6 +15,11 @@ const ACTIONS = {
   get_config: function (payload) { return getConfig_(payload); },
   list_coordinators: function () { return listCoordinators_(); },
   get_sitelookup: function () { return getSiteLookup_(); },
+
+  // Admin — password-gated
+  check_admin_pw: function (payload) { return checkAdminPw_(payload); },
+  upload_sitelookup: function (payload) { return uploadSiteLookup_(payload); },
+  save_config: function (payload) { return saveConfig_(payload); },
 };
 
 function doPost(e) {
