@@ -13,6 +13,7 @@
 // (Apps Script evaluates files in order and the handlers live in later files).
 const ACTIONS = {
   get_config: function (payload) { return getConfig_(payload); },
+  list_coordinators: function () { return listCoordinators_(); },
 };
 
 function doPost(e) {

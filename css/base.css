@@ -1,0 +1,91 @@
+/*
+ * base.css — reset, typography, form controls and the app shell
+ * (sidebar | topbar + content). Logical properties throughout so an Arabic
+ * pass can flip the chrome later (CLAUDE.md §9.2).
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select { font-family: inherit; font-size: 14px; }
+::selection { background: var(--primary-light); }
+
+/* Numbers stay LTR and aligned; Arabic data renders RTL inside the English UI */
+.num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: plaintext; }
+.rtl { direction: rtl; unicode-bidi: plaintext; text-align: right; }
+.hidden { display: none !important; }
+
+/* ---------- Form controls ---------- */
+select,
+input[type=date],
+input[type=text],
+input[type=url],
+input[type=password],
+input[type=number] {
+  padding: 8px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--sh-sm);
+  min-width: 120px;
+}
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+input[type=checkbox] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* ---------- Shell ---------- */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+.sidebar {
+  background: var(--navy);
+  color: var(--inverse);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+.main { display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 26px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topbar h2 { margin: 0; font-size: 17px; font-weight: 700; }
+.topbar .sub { color: var(--muted); font-size: 12.5px; margin-top: 1px; }
+.spacer { flex: 1; }
+.content { padding: 24px 26px; max-width: 1180px; width: 100%; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

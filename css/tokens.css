@@ -1,0 +1,91 @@
+/*
+ * tokens.css — design tokens. The ONLY file allowed to contain a raw colour,
+ * radius or shadow value (CLAUDE.md rule 29). Everything else uses var(--…).
+ * Values match design/Trucks_Tracking_Prototype.html.
+ */
+:root {
+  /* Structure */
+  --navy: #0f1942;
+  --navy-2: #1a1d2e;
+  --navy-3: #232c63;
+
+  /* Accent */
+  --primary: #3d5af1;
+  --primary-hover: #2d47d4;
+  --primary-grad-end: #6b7ff5;
+  --primary-light: #dbeafe;
+  --primary-subtle: #eef0f6;
+  --focus-ring: rgba(61, 90, 241, .15);
+
+  /* Surfaces & lines */
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-2: #fafbfd;
+  --surface-3: #f5f6fa;
+  --border: #e2e4ed;
+  --border-2: #eef0f6;
+
+  /* Text */
+  --text: #1a1d2e;
+  --text-2: #4a5a72;
+  --muted: #9095b0;
+  --subtle: #aab2d8;
+  --inverse: #ffffff;
+
+  /* Sidebar */
+  --nav-fg: #b8c0e0;
+  --nav-hint: #6b74a8;
+  --nav-hover-bg: rgba(255, 255, 255, .06);
+  --nav-avatar-bg: rgba(255, 255, 255, .12);
+  --nav-avatar-fg: #cdd4f5;
+  --nav-avatar-active-bg: rgba(255, 255, 255, .22);
+
+  /* Status */
+  --success: #15803d;
+  --success-bg: #dcfce7;
+  --info: #1e40af;
+  --info-bg: #dbeafe;
+  --warning: #b45309;
+  --warning-bg: #fef3c7;
+  --warning-strong: #92400e;
+  --danger: #991b1b;
+  --danger-bg: #fee2e2;
+  --danger-border: #f4b4b4;
+  --row-warn-bg: #fffdf5;
+  --toast-ok: #7ee2a8;
+
+  /* Period: Old = amber, New = blue */
+  --old-bg: #fef3c7;
+  --old-fg: #92400e;
+  --new-bg: #dbeafe;
+  --new-fg: #1e40af;
+
+  /* Contractor */
+  --inhouse-bg: #eef0f6;
+  --inhouse-fg: #232c63;
+  --contractor-bg: #f3e8ff;
+  --contractor-fg: #6b21a8;
+
+  /* Dashboard accents */
+  --accent-labor: #0ea5e9;
+  --accent-truck: #8b5cf6;
+  --accent-hotel: #f59e0b;
+  --bar-empty: #cbd0e6;
+
+  /* Shadows */
+  --sh-sm: 0 1px 2px rgba(16, 24, 64, .05);
+  --sh-md: 0 1px 4px rgba(16, 24, 64, .10);
+  --sh-lg: 0 8px 24px rgba(16, 24, 64, .14);
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-mark: 9px;
+  --r-lg: 12px;
+  --r-xl: 14px;
+  --r-pill: 999px;
+
+  /* Type & layout */
+  --font: 'Segoe UI', system-ui, -apple-system, 'Tahoma', sans-serif;
+  --sidebar-w: 246px;
+}
