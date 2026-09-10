@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trucks Tracking — Prototype</title>
+<style>
+  :root{
+    --navy:#0f1942; --navy-2:#1a1d2e; --navy-3:#232c63;
+    --primary:#3d5af1; --primary-hover:#2d47d4; --primary-light:#dbeafe; --primary-subtle:#eef0f6;
+    --bg:#faf9f5; --surface:#ffffff; --surface-2:#fafbfd; --surface-3:#f5f6fa;
+    --text:#1a1d2e; --text-2:#4a5a72; --muted:#9095b0; --subtle:#aab2d8; --inverse:#fff;
+    --border:#e2e4ed; --border-2:#eef0f6;
+    --success:#15803d; --success-bg:#dcfce7;
+    --info:#1e40af; --info-bg:#dbeafe;
+    --warning:#b45309; --warning-bg:#fef3c7; --warning-strong:#92400e;
+    --danger:#991b1b; --danger-bg:#fee2e2;
+    --old-bg:#fef3c7; --old-fg:#92400e; --new-bg:#dbeafe; --new-fg:#1e40af;
+    --sh-sm:0 1px 2px rgba(16,24,64,.05); --sh-md:0 1px 4px rgba(16,24,64,.10); --sh-lg:0 8px 24px rgba(16,24,64,.14);
+    --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:14px; --r-pill:999px;
+    --font:'Segoe UI',system-ui,-apple-system,'Tahoma',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+  .num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:plaintext}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  input,select{font-family:inherit;font-size:14px}
+  ::selection{background:var(--primary-light)}
+
+  .app{display:grid;grid-template-columns:246px 1fr;min-height:100vh}
+  .sidebar{background:var(--navy);color:var(--inverse);padding:20px 14px;display:flex;flex-direction:column;gap:20px;overflow-y:auto}
+  .brand{display:flex;align-items:center;gap:11px;padding:4px 6px}
+  .brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#6b7ff5);display:grid;place-items:center;box-shadow:var(--sh-md)}
+  .brand .mark svg{width:20px;height:20px}
+  .brand h1{font-size:15px;margin:0;font-weight:700;letter-spacing:.2px}
+  .brand span{font-size:11px;color:var(--subtle);display:block;font-weight:500}
+
+  .nav-sec{display:flex;flex-direction:column;gap:2px}
+  .nav-lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--subtle);margin:0 6px 7px;display:flex;align-items:center;gap:6px}
+  .nav-lbl .hint{font-size:9.5px;text-transform:none;letter-spacing:0;color:#6b74a8;font-weight:500}
+  .nav-sec button{color:#b8c0e0;text-align:left;padding:8px 11px;border-radius:var(--r-sm);font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:10px;transition:background .12s,color .12s;width:100%}
+  .nav-sec button:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav-sec button.active{background:var(--primary);color:#fff}
+  .nav-sec button svg{width:16px;height:16px;opacity:.85;flex:none}
+  .nav-sec button .av{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:11px;font-weight:700;color:#cdd4f5;flex:none}
+  .nav-sec button.active .av{background:rgba(255,255,255,.22);color:#fff}
+  .nav-sec button .lock{margin-left:auto;opacity:.6}
+  .sidebar .foot{margin-top:auto;font-size:11px;color:var(--subtle);padding:6px;line-height:1.6}
+
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:20}
+  .topbar h2{margin:0;font-size:17px;font-weight:700}
+  .topbar .sub{color:var(--muted);font-size:12.5px;margin-top:1px}
+  .topbar .spacer{flex:1}
+  .content{padding:24px 26px;max-width:1180px;width:100%}
+
+  .filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.2px;margin-left:2px}
+  select,input[type=date],input[type=text],input[type=password],input[type=number]{padding:8px 11px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);box-shadow:var(--sh-sm);min-width:120px}
+  select:focus,input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(61,90,241,.15)}
+  .btn{padding:8px 15px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:background .12s,box-shadow .12s,transform .04s}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:var(--sh-sm)}
+  .btn-primary:hover{background:var(--primary-hover)}
+  .btn-ghost{background:var(--surface);color:var(--text-2);border:1px solid var(--border);box-shadow:var(--sh-sm)}
+  .btn-ghost:hover{background:var(--surface-3);color:var(--text)}
+  .btn-sm{padding:5px 11px;font-size:12.5px}
+  .btn:disabled{opacity:.5;cursor:default}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:var(--r-pill);font-size:11.5px;font-weight:600;white-space:nowrap}
+  .b-old{background:var(--old-bg);color:var(--old-fg)}
+  .b-new{background:var(--new-bg);color:var(--new-fg)}
+  .b-inhouse{background:var(--primary-subtle);color:var(--navy-3)}
+  .b-contractor{background:#f3e8ff;color:#6b21a8}
+  .b-pending{background:var(--surface-3);color:var(--text-2)}
+  .b-approved{background:var(--success-bg);color:var(--success)}
+  .b-warn{background:var(--warning-bg);color:var(--warning-strong)}
+  .flag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--warning-strong);background:var(--warning-bg);padding:2px 7px;border-radius:var(--r-sm);cursor:help}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm)}
+  .card-head{padding:13px 18px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;gap:12px}
+  .card-head h3{margin:0;font-size:14px;font-weight:700}
+  .card-head .spacer{flex:1}
+  .card-body{padding:16px 18px}
+
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface-2)}
+  td{padding:10px 12px;border-bottom:1px solid var(--border-2);vertical-align:middle}
+  tbody tr:hover{background:var(--surface-2)}
+  .grid-wrap{overflow:auto;border-radius:var(--r-lg)}
+  .site{font-weight:700}
+  .editable{border-radius:var(--r-sm);padding:2px 6px;cursor:text;display:inline-block;min-width:44px;transition:background .1s,box-shadow .1s}
+  .editable:hover{background:var(--primary-subtle)}
+  .editable:focus{outline:none;background:#fff;box-shadow:0 0 0 2px var(--primary)}
+  .manual{position:relative}
+  .manual::after{content:"";position:absolute;top:-2px;right:-2px;width:6px;height:6px;border-radius:50%;background:var(--primary)}
+  .rtl{direction:rtl;unicode-bidi:plaintext;text-align:right}
+  .trip-head td{background:var(--surface-3);font-weight:600;color:var(--text-2);border-top:2px solid var(--border)}
+  .trip-head .num{font-weight:700;color:var(--text)}
+  .child td:first-child{padding-left:26px}
+  .row-approved{opacity:.62}
+  .row-approved .editable{pointer-events:none}
+  .row-warn{background:#fffdf5}
+  input[type=checkbox]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer;vertical-align:middle}
+
+  .bar{display:flex;align-items:center;gap:12px;padding:11px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);margin-bottom:16px}
+  .bar .count{font-size:13px;color:var(--text-2)}
+  .bar .count b{color:var(--text)}
+  .bar .spacer{flex:1}
+  .namebox{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);padding:8px 14px;margin-bottom:16px}
+  .namebox label{font-size:12px;color:var(--muted);font-weight:600}
+  .namebox input{min-width:150px}
+  .namebox .tip{font-size:11.5px;color:var(--muted);margin-left:auto}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 17px;box-shadow:var(--sh-sm);position:relative;overflow:hidden}
+  .stat .k{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:25px;font-weight:800;margin-top:6px;letter-spacing:-.5px}
+  .stat .v small{font-size:13px;font-weight:600;color:var(--muted);margin-left:3px}
+  .stat .accent{position:absolute;inset:0 auto 0 0;width:4px}
+  .stat.total .accent{background:var(--primary)}
+  .stat.labor .accent{background:#0ea5e9}
+  .stat.truck .accent{background:#8b5cf6}
+  .stat.hotel .accent{background:#f59e0b}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.two{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.app{grid-template-columns:1fr}.sidebar{display:none}}
+  .split-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-2)}
+  .split-row:last-child{border-bottom:none}
+  .split-row .name{width:150px;font-weight:600;font-size:13px}
+  .split-row .track{flex:1;height:9px;background:var(--surface-3);border-radius:var(--r-pill);overflow:hidden}
+  .split-row .fill{height:100%;border-radius:var(--r-pill)}
+  .split-row .amt{width:92px;text-align:right;font-weight:700;font-size:13px}
+  .note{font-size:12px;color:var(--muted);background:var(--surface-2);border:1px dashed var(--border);border-radius:var(--r-sm);padding:8px 11px;margin-top:12px;line-height:1.55}
+
+  .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:13px;margin-top:4px}
+  .file{border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;background:var(--surface);box-shadow:var(--sh-sm);display:flex;flex-direction:column;gap:10px}
+  .file .xl{display:flex;align-items:center;gap:10px}
+  .file .xl .ic{width:36px;height:36px;border-radius:8px;background:var(--success-bg);color:var(--success);display:grid;place-items:center;font-weight:800;font-size:12px}
+  .file .fname{font-weight:700;font-size:12.5px;word-break:break-all;line-height:1.35}
+  .file .meta{font-size:11.5px;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-pill);background:var(--surface-3);border:1px solid var(--border);font-size:12px;font-weight:500}
+  .chip button{color:var(--muted);font-weight:700;line-height:1;font-size:14px}
+  .chip.excluded{background:var(--danger-bg);border-color:#f4b4b4;color:var(--danger);text-decoration:line-through}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text-2);margin-top:14px;padding-top:14px;border-top:1px solid var(--border-2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+
+  .drop{border:2px dashed var(--border);border-radius:var(--r-lg);padding:26px;text-align:center;color:var(--muted);background:var(--surface-2)}
+  .drop b{color:var(--text)}
+  .kv{display:grid;grid-template-columns:180px 1fr;gap:12px 14px;align-items:center}
+  .kv .k{font-weight:600;color:var(--text-2);font-size:13px}
+  .taglist{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{background:var(--primary-subtle);color:var(--navy-3);padding:3px 10px;border-radius:var(--r-pill);font-size:12.5px;font-weight:600}
+
+  /* Trip editor */
+  .trip-card{border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);background:var(--surface);margin-bottom:14px;overflow:hidden}
+  .trip-card .th{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface-3);border-bottom:1px solid var(--border-2);flex-wrap:wrap}
+  .trip-card .th .id{font-weight:800;font-size:13px}
+  .trip-card .th .meta{color:var(--text-2);font-size:12.5px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .trip-card .th .spacer{flex:1}
+  .comp{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;padding:14px 16px;align-items:end}
+  .comp .f label{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px}
+  .comp .f input{width:100%;text-align:right}
+  .comp .tot{text-align:right;padding-left:8px}
+  .comp .tot .k{font-size:11px;color:var(--muted);font-weight:600}
+  .comp .tot .v{font-size:20px;font-weight:800}
+  .trip-card .sites{padding:0 16px 14px}
+  .trip-card .sites table{font-size:13px}
+  .trip-card .sites th{background:transparent;border:none;padding:6px 10px}
+  .trip-card .sites td{border-bottom:1px dashed var(--border-2);padding:7px 10px}
+  .dirty{box-shadow:0 0 0 2px var(--primary)}
+  .save-note{font-size:12px;color:var(--warning-strong);background:var(--warning-bg);border-radius:var(--r-sm);padding:8px 11px;margin:0 16px 14px;display:none}
+  .save-note.show{display:block}
+
+  /* Lock */
+  .lock-wrap{max-width:380px;margin:60px auto;text-align:center}
+  .lock-wrap .ring{width:56px;height:56px;border-radius:50%;background:var(--primary-subtle);display:grid;place-items:center;margin:0 auto 16px}
+  .lock-wrap h3{margin:0 0 6px;font-size:18px}
+  .lock-wrap p{color:var(--muted);margin:0 0 18px}
+  .lock-wrap input{text-align:center;letter-spacing:3px;margin-bottom:12px;width:100%}
+
+  .empty{text-align:center;color:var(--muted);padding:50px 20px}
+  .empty svg{width:40px;height:40px;opacity:.4;margin-bottom:10px}
+
+  .hidden{display:none!important}
+  .tabs{display:flex;gap:4px;background:var(--surface-3);padding:4px;border-radius:var(--r-md);width:fit-content;margin-bottom:18px}
+  .tabs button{padding:7px 16px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;color:var(--text-2)}
+  .tabs button.active{background:var(--surface);color:var(--navy);box-shadow:var(--sh-sm)}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--r-pill);font-size:13.5px;font-weight:600;box-shadow:var(--sh-lg);opacity:0;transition:transform .25s,opacity .25s;z-index:100;display:flex;align-items:center;gap:9px;max-width:90vw}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .toast .ok{color:#7ee2a8}
+  .proto-tag{font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--warning-strong);background:var(--warning-bg);padding:3px 8px;border-radius:var(--r-pill)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg></div>
+      <div><h1>Trucks Tracking</h1><span>LMP · Telecom</span></div>
+    </div>
+    <nav id="sidebar"></nav>
+    <div class="foot">Prototype · sample data<br>No login — WH reps stay on the Google Form</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div><h2 id="pageTitle">—</h2><div class="sub" id="pageSub"></div></div>
+      <div class="spacer"></div>
+      <span class="proto-tag">PROTOTYPE</span>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Sample data: trips are the only place money lives ---------- */
+const TRIPS = [
+  { id:'T-1042', date:'2025-10-06', coord:'Gendy', driver:'ولاء دبابة', route:'الكان اكتوبر+ المخزن',
+    labor:400, park:100, truck:1800, hotel:200,
+    sites:[{site:'D0079',jc:'MK940',contractor:'In-House',period:'new'},{site:'D0376',jc:'MK921',contractor:'In-House',period:'new'}]},
+  { id:'T-1043', date:'2025-10-06', coord:'Gendy', driver:'طارق جامبو', route:'شبرا منت+ المخزن',
+    labor:250, park:0, truck:1000, hotel:0,
+    sites:[{site:'R2551',jc:'MG1369',contractor:'LM+',period:'old'},{site:'R2837',jc:'MG1371',contractor:'El-Khayal',period:'old'}]},
+  { id:'T-1044', date:'2025-10-06', coord:'Gendy', driver:'ولاء جامبو', route:'فودافون اكتوبر مرتجع+ المخزن',
+    labor:120, park:0, truck:1600, hotel:0,
+    sites:[{site:'D3406',jc:'MGDL49',contractor:'In-House',period:'new'},{site:'D3927',jc:'MGDL50',contractor:'In-House',period:'new'},{site:'D7286',jc:'MGDL45',contractor:'In-House',period:'new'},{site:'6333',jc:'MGDL48',contractor:'In-House',period:'new'}]},
+  { id:'T-1045', date:'2025-10-07', coord:'Gendy', driver:'الشيخ ياسر', route:'العياط موقعين',
+    labor:0, park:0, truck:1600, hotel:0,
+    sites:[{site:'FA6767',jc:'MGDL80',contractor:'El-Khayal',period:'new'},{site:'U4900',jc:'',contractor:'',period:'',warn:'unknown_site'}]},
+  { id:'T-1046', date:'2025-10-08', coord:'Gendy', driver:'راغب', route:'كفر صقر',
+    labor:300, park:0, truck:600, hotel:0,
+    sites:[{site:'6365',jc:'MW841',contractor:'In-House',period:'old',warn:'conflict'}]},
+  { id:'T-1050', date:'2025-10-06', coord:'Saad El Dewaik', driver:'ايمن نقل دبابة', route:'شبرا منت+ المخزن مرتجع',
+    labor:0, park:0, truck:3500, hotel:0,
+    sites:[{site:'6437',jc:'KH59',contractor:'El-Khayal',period:'old'},{site:'U6029',jc:'KH58',contractor:'El-Khayal',period:'old'}]},
+  { id:'T-1051', date:'2025-10-06', coord:'Mohamed Emara', driver:'ولاء دبابة', route:'أنشاص الشرقيه+ المخزن',
+    labor:250, park:0, truck:1250, hotel:0,
+    sites:[{site:'D0801',jc:'MK980',contractor:'In-House',period:'new'},{site:'D0802',jc:'MK981',contractor:'In-House',period:'new'}]},
+  { id:'T-1052', date:'2025-10-06', coord:'Mahmoud Amien', driver:'عاشور دبابة', route:'بنها موقعين',
+    labor:0, park:0, truck:1300, hotel:0,
+    sites:[{site:'R3001',jc:'MG1400',contractor:'LM+',period:'old'},{site:'R3002',jc:'MG1401',contractor:'In-House',period:'new'}]},
+];
+
+const CONTRACTORS = ['In-House','El-Khayal','LM+'];
+const money = n => Math.round(n).toLocaleString('en-US');
+const tripTotal = t => t.labor+t.park+t.truck+t.hotel;
+// explode a trip into per-site lines with even split, remainder on the last site
+function explode(t){
+  const n=t.sites.length, tot=tripTotal(t), base=Math.round(tot/n);
+  return t.sites.map((s,i)=>({
+    key:`${t.id}:${i}`, tripId:t.id, date:t.date, coord:t.coord, driver:t.driver, route:t.route,
+    site:s.site, jc:s.jc, contractor:s.contractor, period:s.period, warn:s.warn,
+    cost: i===n-1 ? tot-base*(n-1) : base
+  }));
+}
+const allLines = () => TRIPS.flatMap(explode);
+const coordinators = () => [...new Set(TRIPS.map(t=>t.coord))];
+
+const state = { page:null, coordApproved:new Map(), pmApproved:new Set(), excluded:new Set(),
+  generated:false, adminUnlocked:false, reviewer:{}, dirty:new Set() };
+
+const $ = s=>document.querySelector(s);
+function toast(msg,ok=true){const t=$('#toast');t.innerHTML=(ok?'<span class="ok">✓</span>':'')+msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function periodBadge(p){if(!p)return '<span class="badge b-warn">—</span>';return p==='old'?'<span class="badge b-old">Old</span>':'<span class="badge b-new">New</span>';}
+function contractorBadge(c){if(!c)return '<span class="badge b-warn">—</span>';return c==='In-House'?'<span class="badge b-inhouse">In-House</span>':`<span class="badge b-contractor">${c}</span>`;}
+function warnFlag(w){if(w==='unknown_site')return '<span class="flag" title="Site not in the master — fill JC/contractor by hand. Does not block approval.">⚠ unknown site</span>';if(w==='conflict')return '<span class="flag" title="This site exists in both Old and New periods — you decide.">⚠ conflict</span>';return '';}
+function svg(p){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;}
+const IC={
+  check:'<path d="M20 6 9 17l-5-5"/>', chart:'<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  cog:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 3.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H8a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V8a1.65 1.65 0 0 0 1.51 1H22a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+};
+
+/* ---------- Sidebar ---------- */
+function renderSidebar(){
+  const coords = coordinators();
+  const cbtns = coords.map(c=>`<button data-page="coord:${c}"><span class="av">${c[0]}</span>${c}</button>`).join('');
+  $('#sidebar').innerHTML = `
+    <div class="nav-sec">
+      <div class="nav-lbl">Coordinators <span class="hint">· auto-detected</span></div>
+      ${cbtns}
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Project Manager</div>
+      <button data-page="pm:approvals">${svg(IC.check)}Approvals</button>
+      <button data-page="pm:dashboard">${svg(IC.chart)}Dashboard</button>
+      <button data-page="pm:export">${svg(IC.download)}Export</button>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Tools</div>
+      <button data-page="trips">${svg(IC.edit)}Trips by day</button>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Restricted</div>
+      <button data-page="admin">${svg(IC.cog)}Admin ${svg(IC.lock).replace('<svg','<svg class="lock" width="13" height="13"')}</button>
+    </div>`;
+  $('#sidebar').querySelectorAll('button').forEach(b=>b.onclick=()=>go(b.dataset.page));
+  markActive();
+}
+function markActive(){$('#sidebar').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.page===state.page));}
+function go(page){state.page=page;markActive();render();}
+
+/* ---------- Router ---------- */
+function setHead(t,s){$('#pageTitle').textContent=t;$('#pageSub').textContent=s;}
+function render(){
+  const c=$('#content'), p=state.page;
+  if(p.startsWith('coord:')){const name=p.slice(6);setHead(name,'Trips routed to '+name+', split per site');c.innerHTML=coordPage(name);wireCoord(name);}
+  else if(p==='pm:approvals'){setHead('Approvals','Every coordinator-approved line, consolidated');c.innerHTML=pmApprovals();wirePm();}
+  else if(p==='pm:dashboard'){setHead('Dashboard','Totals and per-item spend');c.innerHTML=pmDashboard();}
+  else if(p==='pm:export'){setHead('Export','Generate the finance files');c.innerHTML=pmExport();wireExport();}
+  else if(p==='trips'){setHead('Trips by day','Fix a trip amount — the per-site split recalculates on save');c.innerHTML=tripEditor();wireEditor();}
+  else if(p==='admin'){setHead('Admin','Master upload and settings');c.innerHTML=state.adminUnlocked?adminBody():adminLock();wireAdmin();}
+}
+
+/* ---------- Coordinator page ---------- */
+function coordPage(name){
+  const trips=TRIPS.filter(t=>t.coord===name);
+  if(!trips.length) return `<div class="card"><div class="empty">${svg('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>')}<div>No trips routed to ${name} this week.</div></div></div>`;
+  const rev = state.reviewer[name]||name;
+  const rows=[];
+  trips.forEach(t=>{
+    const lines=explode(t);
+    rows.push(`<tr class="trip-head"><td colspan="9"><span class="num">${t.date}</span> · <span class="rtl">${t.route}</span> · driver <span class="rtl">${t.driver}</span> · total <span class="num">${money(tripTotal(t))}</span> EGP over ${lines.length} site${lines.length>1?'s':''} → <span class="num">${money(lines[0].cost)}</span>/site</td></tr>`);
+    lines.forEach(l=>{
+      const a=state.coordApproved.get(l.key);
+      rows.push(`<tr class="child ${a?'row-approved':''} ${l.warn?'row-warn':''}" data-key="${l.key}">
+        <td><input type="checkbox" class="rowcb" ${a?'disabled':''}></td>
+        <td class="site num">${l.site}</td>
+        <td><span class="editable ${l.jc?'':'manual'}" contenteditable="true">${l.jc||'—'}</span></td>
+        <td class="rtl">${l.route}</td>
+        <td><span class="editable">${l.contractor||'—'}</span></td>
+        <td>${periodBadge(l.period)}</td>
+        <td class="num">${money(l.cost)}</td>
+        <td>${a?`<span class="badge b-approved">Approved · ${a.by}</span>`:(l.warn?warnFlag(l.warn):'<span class="badge b-pending">Pending</span>')}</td>
+        <td>${a?'':'<button class="btn btn-ghost btn-sm approve1">Approve</button>'}</td>
+      </tr>`);
+    });
+  });
+  const total=trips.reduce((n,t)=>n+t.sites.length,0);
+  const appr=[...state.coordApproved.keys()].filter(k=>trips.some(t=>k.startsWith(t.id+':'))).length;
+  return `
+    <div class="namebox">
+      <label>Reviewing as</label>
+      <input type="text" id="revName" value="${rev}">
+      <span class="tip">Stamped on each line you approve — no login, just your name</span>
+    </div>
+    <div class="bar">
+      <label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px"><input type="checkbox" id="selall"> Select all</label>
+      <span class="count"><b class="num">${total-appr}</b> pending · <b class="num">${appr}</b> approved</span>
+      <div class="spacer"></div>
+      <button class="btn btn-primary btn-sm" id="approveSel">Approve selected</button>
+    </div>
+    <div class="card"><div class="grid-wrap"><table>
+      <thead><tr><th style="width:34px"></th><th>Site</th><th>Job code</th><th>Route</th><th>Contractor</th><th>Period</th><th>Cost</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows.join('')}</tbody></table></div>
+      <div class="card-body" style="border-top:1px solid var(--border-2)"><div class="legend">
+        <span>${periodBadge('old')} / ${periodBadge('new')} from the master</span>
+        <span><span class="flag">⚠ unknown site</span> fill by hand, still submits</span>
+        <span><span class="manual editable" style="min-width:0">•</span> manual override</span>
+      </div></div></div>`;
+}
+function wireCoord(name){
+  const rn=$('#revName'); rn.oninput=()=>state.reviewer[name]=rn.value;
+  const sa=$('#selall'); sa&&(sa.onchange=e=>document.querySelectorAll('.rowcb:not([disabled])').forEach(cb=>cb.checked=e.target.checked));
+  const by=()=>state.reviewer[name]||name;
+  $('#approveSel').onclick=()=>{const keys=[...document.querySelectorAll('.rowcb:checked')].map(cb=>cb.closest('tr').dataset.key);if(!keys.length){toast('Select rows first',false);return;}keys.forEach(k=>state.coordApproved.set(k,{by:by(),at:Date.now()}));toast(`${keys.length} line${keys.length>1?'s':''} approved as ${by()}`);render();};
+  document.querySelectorAll('.approve1').forEach(b=>b.onclick=()=>{state.coordApproved.set(b.closest('tr').dataset.key,{by:by(),at:Date.now()});toast('Line approved as '+by());render();});
+  document.querySelectorAll('.editable[contenteditable]').forEach(el=>{el.addEventListener('focus',()=>{if(el.textContent.trim()==='—')el.textContent='';});el.addEventListener('blur',()=>{if(el.textContent.trim()!=='')el.classList.add('manual');else el.textContent='—';});});
+}
+
+/* ---------- PM approvals ---------- */
+function pmApprovals(){
+  const lines=allLines();
+  const rows=lines.map((l,i)=>{const a=state.pmApproved.has(l.key);
+    return `<tr class="${a?'row-approved':''}" data-key="${l.key}">
+      <td><input type="checkbox" class="pmcb" ${a?'disabled':''}></td>
+      <td class="num">${l.date}</td><td>${l.coord}</td><td class="site num">${l.site}</td><td class="num">${l.jc||'—'}</td>
+      <td class="rtl">${l.driver}</td><td class="num">${money(l.cost)}</td><td>${periodBadge(l.period)}</td><td>${contractorBadge(l.contractor)}</td>
+      <td>${a?'<span class="badge b-approved">Approved</span>':'<span class="badge b-pending">Awaiting PM</span>'}</td>
+      <td>${a?'':'<button class="btn btn-ghost btn-sm pmApprove1">Approve</button>'}</td></tr>`;}).join('');
+  const pending=lines.length-state.pmApproved.size;
+  return `<div class="filters">
+      <div class="field"><label>Week</label><select><option>2025-W41 (6–12 Oct)</option><option>All open</option></select></div>
+      <div class="field"><label>Coordinator</label><select><option>All</option>${coordinators().map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Period</label><select><option>All</option><option>Old</option><option>New</option></select></div>
+    </div>
+    <div class="bar"><label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px"><input type="checkbox" id="pmSelall"> Select all</label>
+      <span class="count"><b class="num">${pending}</b> awaiting PM · <b class="num">${state.pmApproved.size}</b> approved</span>
+      <div class="spacer"></div><button class="btn btn-primary btn-sm" id="pmApproveSel">Approve selected</button></div>
+    <div class="card"><div class="grid-wrap"><table>
+      <thead><tr><th style="width:34px"></th><th>Date</th><th>Coordinator</th><th>Site</th><th>Job code</th><th>Driver</th><th>Cost</th><th>Period</th><th>Contractor</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows}</tbody></table></div></div>`;
+}
+function wirePm(){
+  const sa=$('#pmSelall');sa&&(sa.onchange=e=>document.querySelectorAll('.pmcb:not([disabled])').forEach(cb=>cb.checked=e.target.checked));
+  $('#pmApproveSel').onclick=()=>{const keys=[...document.querySelectorAll('.pmcb:checked')].map(cb=>cb.closest('tr').dataset.key);if(!keys.length){toast('Select rows first',false);return;}keys.forEach(k=>state.pmApproved.add(k));toast(`${keys.length} line${keys.length>1?'s':''} approved`);render();};
+  document.querySelectorAll('.pmApprove1').forEach(b=>b.onclick=()=>{state.pmApproved.add(b.closest('tr').dataset.key);toast('Line approved');render();});
+}
+
+/* ---------- PM dashboard ---------- */
+function pmDashboard(){
+  const lines=allLines();
+  const total=lines.reduce((s,l)=>s+l.cost,0);
+  const comp={Labor:0,Truck:0,Hotel:0,Park:0};
+  TRIPS.forEach(t=>{comp.Labor+=t.labor;comp.Truck+=t.truck;comp.Hotel+=t.hotel;comp.Park+=t.park;});
+  const byC={},byCo={};
+  lines.forEach(l=>{byC[l.contractor||'—']=(byC[l.contractor||'—']||0)+l.cost;byCo[l.coord]=(byCo[l.coord]||0)+l.cost;});
+  const cmax=Math.max(...Object.values(byC)),dmax=Math.max(...Object.values(byCo));
+  const cc={'In-House':'var(--primary)','El-Khayal':'#8b5cf6','LM+':'#0ea5e9','—':'#cbd0e6'};
+  return `<div class="filters">
+      <div class="field"><label>Range</label><select><option>Week 2025-W41</option><option>October 2025</option><option>Custom dates…</option></select></div>
+      <div class="field"><label>Coordinator</label><select><option>All</option>${coordinators().map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Contractor</label><select><option>All</option>${CONTRACTORS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+    </div>
+    <div class="stats">
+      <div class="stat total"><div class="accent"></div><div class="k">Total spend</div><div class="v num">${money(total)} <small>EGP</small></div></div>
+      <div class="stat labor"><div class="accent"></div><div class="k">Labor</div><div class="v num">${money(comp.Labor)} <small>EGP</small></div></div>
+      <div class="stat truck"><div class="accent"></div><div class="k">Truck cost</div><div class="v num">${money(comp.Truck)} <small>EGP</small></div></div>
+      <div class="stat hotel"><div class="accent"></div><div class="k">Hotel</div><div class="v num">${money(comp.Hotel)} <small>EGP</small></div></div>
+    </div>
+    <div class="two">
+      <div class="card"><div class="card-head"><h3>By contractor</h3><div class="spacer"></div><span class="badge b-pending">total only</span></div>
+        <div class="card-body">${Object.entries(byC).map(([k,v])=>`<div class="split-row"><div class="name">${k}</div><div class="track"><div class="fill" style="width:${Math.round(v/cmax*100)}%;background:${cc[k]||'var(--primary)'}"></div></div><div class="amt num">${money(v)}</div></div>`).join('')}
+        <div class="note">Component split (Labor / Truck / Hotel / Park) lives on the trip, so it slices by coordinator, week, date and driver — but not by contractor or Old/New, since one trip can straddle In-House and a contractor. Those two slice the totals.</div></div></div>
+      <div class="card"><div class="card-head"><h3>By coordinator</h3></div>
+        <div class="card-body">${Object.entries(byCo).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="split-row"><div class="name">${k}</div><div class="track"><div class="fill" style="width:${Math.round(v/dmax*100)}%;background:var(--primary)"></div></div><div class="amt num">${money(v)}</div></div>`).join('')}</div></div>
+    </div>`;
+}
+
+/* ---------- PM export (day-brief then per-site detail) ---------- */
+function pmExport(){
+  const drivers=[...new Set(allLines().map(l=>l.driver))];
+  const chips=drivers.map(d=>{const ex=state.excluded.has(d);return `<span class="chip ${ex?'excluded':''}" data-driver="${d}"><span class="rtl">${d}</span><button>${ex?'+':'×'}</button></span>`;}).join('');
+  const body=state.generated?exportFiles():`<div class="note" style="margin-top:0">Pick a week or date range, exclude any drivers, then generate. In-house produces two files (Old, New); each contractor gets one file for all periods. Each file is grouped as a daily brief with its per-site detail underneath.</div>`;
+  return `<div class="card"><div class="card-head"><h3>Selection</h3></div><div class="card-body">
+      <div class="filters" style="margin-bottom:14px">
+        <div class="field"><label>Week</label><select><option>2025-W41 (6–12 Oct)</option></select></div>
+        <div class="field"><label>Or from</label><input type="date" value="2025-10-06"></div>
+        <div class="field"><label>to</label><input type="date" value="2025-10-12"></div>
+        <div class="field"><label>In-house</label><select><option>Both files (Old + New)</option><option>Old only</option><option>New only</option></select></div>
+      </div>
+      <label style="font-size:11px;color:var(--muted);font-weight:600">Exclude drivers from the output</label>
+      <div class="chips" style="margin-top:7px">${chips}</div>
+      <div style="margin-top:16px;display:flex;gap:10px"><button class="btn btn-primary" id="genBtn">Generate files</button>${state.generated?'<button class="btn btn-ghost" id="commitBtn">Confirm export &amp; lock rows</button>':''}</div>
+    </div></div>
+    <div style="margin-top:16px">${body}</div>`;
+}
+function exportFiles(){
+  const active=allLines().filter(l=>!state.excluded.has(l.driver));
+  const inNew=active.filter(l=>l.contractor==='In-House'&&l.period==='new');
+  const inOld=active.filter(l=>l.contractor==='In-House'&&l.period==='old');
+  const byC={};active.filter(l=>l.contractor&&l.contractor!=='In-House').forEach(l=>{(byC[l.contractor]=byC[l.contractor]||[]).push(l);});
+  const sum=a=>a.reduce((s,l)=>s+l.cost,0);
+  const fcard=(name,rows,tag)=>`<div class="file"><div class="xl"><div class="ic">XLS</div><div><div class="fname">${name}</div><div class="meta">${rows.length} rows · ${money(sum(rows))} EGP</div></div></div><div>${tag}</div><button class="btn btn-ghost btn-sm" onclick="toast('Download started (prototype)')">Download</button></div>`;
+  const cards=[fcard('InHouse_OLD_2025-W41.xlsx',inOld,periodBadge('old')),fcard('InHouse_NEW_2025-W41.xlsx',inNew,periodBadge('new')),...Object.entries(byC).map(([c,r])=>fcard(`${c.replace(/[^A-Za-z0-9]/g,'')}_2025-W41.xlsx`,r,contractorBadge(c)))].join('');
+  // preview: In-House NEW grouped by day/trip brief then site detail
+  const groups={};inNew.forEach(l=>{(groups[l.tripId]=groups[l.tripId]||[]).push(l);});
+  let pv='';Object.values(groups).forEach(g=>{const t=TRIPS.find(x=>x.id===g[0].tripId);
+    pv+=`<tr class="trip-head"><td colspan="5"><span class="num">${t.date}</span> · <span class="rtl">${t.route}</span> · <span class="rtl">${t.driver}</span> · brief total <span class="num">${money(g.reduce((s,l)=>s+l.cost,0))}</span></td></tr>`;
+    g.forEach(l=>pv+=`<tr class="child"><td class="site num">${l.site}</td><td class="num">${l.jc}</td><td class="rtl">${l.route}</td><td>${periodBadge(l.period)}</td><td class="num">${money(l.cost)}</td></tr>`);});
+  pv+=`<tr class="trip-head"><td colspan="4" style="text-align:right;font-weight:700">File total</td><td class="num" style="font-weight:800">${money(sum(inNew))}</td></tr>`;
+  return `<div class="files">${cards}</div>
+    <div class="card" style="margin-top:16px"><div class="card-head"><h3>Preview — In-House NEW</h3><div class="spacer"></div><span class="badge b-inhouse">daily brief → per-site detail</span></div>
+    <div class="grid-wrap"><table><thead><tr><th>Site</th><th>Job code</th><th>Route</th><th>Period</th><th>Cost</th></tr></thead><tbody>${pv}</tbody></table></div></div>`;
+}
+function wireExport(){
+  document.querySelectorAll('.chip[data-driver]').forEach(ch=>ch.querySelector('button').onclick=()=>{const d=ch.dataset.driver;state.excluded.has(d)?state.excluded.delete(d):state.excluded.add(d);render();});
+  const g=$('#genBtn');g&&(g.onclick=()=>{state.generated=true;toast('Files generated');render();});
+  const cm=$('#commitBtn');cm&&(cm.onclick=()=>toast('Rows stamped exported & locked (prototype)'));
+}
+
+/* ---------- Trips by day editor ---------- */
+function tripEditor(){
+  const day='2025-10-06';
+  const trips=TRIPS.filter(t=>t.date===day);
+  const cards=trips.map(t=>{
+    const lines=explode(t);
+    const siteRows=lines.map((l,i)=>`<tr><td class="site num">${l.site}</td><td class="num">${l.jc||'—'}</td><td>${contractorBadge(l.contractor)}</td><td>${periodBadge(l.period)}</td><td class="num" data-cost="${l.key}" style="font-weight:700">${money(l.cost)}</td><td style="text-align:right"><button class="rm-site" data-trip="${t.id}" data-i="${i}" title="Remove site" ${lines.length<=1?'disabled':''} style="color:var(--danger);font-weight:700;font-size:16px;line-height:1;padding:0 7px;${lines.length<=1?'opacity:.3':''}">×</button></td></tr>`).join('');
+    const f=(k,label,v)=>`<div class="f"><label>${label}</label><input type="number" data-trip="${t.id}" data-part="${k}" value="${v}"></div>`;
+    return `<div class="trip-card" data-trip="${t.id}">
+      <div class="th"><span class="id">${t.id}</span><div class="meta"><span>${t.coord}</span><span>·</span><span class="rtl">${t.route}</span><span>·</span><span class="rtl">${t.driver}</span></div><div class="spacer"></div><span class="badge b-pending">${lines.length} site${lines.length>1?'s':''}</span></div>
+      <div class="comp">
+        ${f('labor','Labor',t.labor)}${f('park','Park',t.park)}${f('truck','Truck cost',t.truck)}${f('hotel','Hotel',t.hotel)}
+        <div class="tot"><div class="k">TRIP TOTAL</div><div class="v num" data-total="${t.id}">${money(tripTotal(t))}</div></div>
+      </div>
+      <div class="save-note" data-note="${t.id}">Amount changed — saving will re-split evenly across ${lines.length} sites and revert any already-approved lines on this trip to pending.</div>
+      <div class="sites"><table><thead><tr><th>Site</th><th>Job code</th><th>Contractor</th><th>Period</th><th>Split cost</th><th></th></tr></thead><tbody>${siteRows}</tbody></table>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <input type="text" class="add-site-inp" data-trip="${t.id}" placeholder="New site ID…" style="max-width:150px">
+          <button class="btn btn-ghost btn-sm add-site" data-trip="${t.id}">+ Add site</button>
+          <span style="font-size:11.5px;color:var(--muted)">added sites start unclassified — the coordinator fills JC / contractor / period</span>
+          <div style="flex:1"></div>
+          <button class="btn btn-primary btn-sm save-trip" data-trip="${t.id}" disabled>Save money change</button>
+        </div>
+      </div></div>`;
+  }).join('');
+  return `<div class="filters"><div class="field"><label>Day</label><input type="date" value="${day}" id="dayPick"></div>
+      <div class="field"><label>&nbsp;</label><span style="font-size:12.5px;color:var(--muted);padding-top:8px;display:inline-block">${trips.length} trip${trips.length>1?'s':''} submitted this day</span></div></div>
+    <div class="note" style="margin:0 0 16px">This is the raw trip as the rep entered it — where money <b>and</b> the site list both live. Fix a wrong amount (Save money change) or add / remove a site; either way the per-site lines recalculate automatically and any already-approved lines on that trip drop back to pending. The coordinator's page follows along.</div>
+    ${cards}`;
+}
+function wireEditor(){
+  document.querySelectorAll('.comp input').forEach(inp=>inp.oninput=()=>{
+    const id=inp.dataset.trip;const t=TRIPS.find(x=>x.id===id);
+    const vals={};document.querySelectorAll(`.comp input[data-trip="${id}"]`).forEach(i=>vals[i.dataset.part]=+i.value||0);
+    const total=vals.labor+vals.park+vals.truck+vals.hotel;
+    document.querySelector(`[data-total="${id}"]`).textContent=money(total);
+    // live preview the re-split
+    const n=t.sites.length,base=Math.round(total/n);
+    t.sites.forEach((s,i)=>{const c=i===n-1?total-base*(n-1):base;const cell=document.querySelector(`[data-cost="${id}:${i}"]`);if(cell){cell.textContent=money(c);cell.classList.add('dirty');}});
+    document.querySelector(`[data-note="${id}"]`).classList.add('show');
+    document.querySelector(`.save-trip[data-trip="${id}"]`).disabled=false;
+  });
+  const revertTrip=t=>{let r=0;[...state.coordApproved.keys()].forEach(k=>{if(k.startsWith(t.id+':')){state.coordApproved.delete(k);r++;}});[...state.pmApproved].forEach(k=>{if(k.startsWith(t.id+':')){state.pmApproved.delete(k);r++;}});return r;};
+  document.querySelectorAll('.save-trip').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.trip;const t=TRIPS.find(x=>x.id===id);
+    ['labor','park','truck','hotel'].forEach(p=>{t[p]=+document.querySelector(`.comp input[data-trip="${id}"][data-part="${p}"]`).value||0;});
+    const reverted=revertTrip(t);
+    toast(`${id} re-split · ${reverted} approved line${reverted===1?'':'s'} reverted to pending`);render();
+  });
+  document.querySelectorAll('.rm-site').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.trip,i=+b.dataset.i,t=TRIPS.find(x=>x.id===id);
+    if(t.sites.length<=1){toast('A trip needs at least one site',false);return;}
+    const removed=t.sites[i].site;t.sites.splice(i,1);const rev=revertTrip(t);
+    toast(`Site ${removed} removed · re-split across ${t.sites.length} · ${rev} approved reverted`);render();
+  });
+  document.querySelectorAll('.add-site').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.trip,t=TRIPS.find(x=>x.id===id),inp=document.querySelector(`.add-site-inp[data-trip="${id}"]`),v=(inp.value||'').trim().toUpperCase();
+    if(!v){toast('Enter a site ID',false);return;}
+    t.sites.push({site:v,jc:'',contractor:'',period:'',warn:'unknown_site'});const rev=revertTrip(t);
+    toast(`Site ${v} added · re-split across ${t.sites.length} · ${rev} approved reverted`);render();
+  });
+  const dp=$('#dayPick');dp&&(dp.onchange=()=>toast('Prototype shows 2025-10-06 only'));
+}
+
+/* ---------- Admin ---------- */
+function adminLock(){return `<div class="lock-wrap"><div class="ring">${svg(IC.lock).replace('<svg','<svg width="24" height="24" style="color:var(--primary)"')}</div>
+  <h3>Admin is password-protected</h3><p>Master upload and config are the only actions behind a password. Everything else is open.</p>
+  <input type="password" id="pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')document.getElementById('unlock').click()">
+  <button class="btn btn-primary" id="unlock" style="width:100%">Unlock</button>
+  <p style="margin-top:12px;font-size:12px">Prototype: any value unlocks. The real check runs in Apps Script.</p></div>`;}
+function adminBody(){ return adminMaster(); }
+function adminMaster(){
+  const sample=[['K4429-ABD01','07-Dec-2025','Old','In-House',''],['R2551-MG1369','01-Oct-2025','Old','LM+',''],['6365-MW841','04-Oct-2025','New','In-House','both periods'],['D0079-MK940','01-Oct-2025','New','In-House','']];
+  return `<div class="tabs" id="atabs"><button class="active" data-atab="master">Site master</button><button data-atab="config">Config</button></div>
+    <div id="ainner">${adminMasterInner(sample)}</div>`;
+}
+function adminMasterInner(sample){
+  return `<div class="card"><div class="card-head"><h3>Upload Site-JC master</h3></div><div class="card-body">
+      <div class="drop">Drop <b>SiteID_JC_New.xlsx</b> here, or <b>browse</b><br><span style="font-size:12px">Replaces the lookup. Task dates decide the pick; a matched row's Old/New and Contractor are used as-is.</span></div>
+      <div style="margin-top:14px;display:flex;gap:10px"><button class="btn btn-primary" onclick="toast('Master uploaded — 1,204 tasks (prototype)')">Upload &amp; replace</button><button class="btn btn-ghost">Download current</button></div></div></div>
+    <div class="card" style="margin-top:16px"><div class="card-head"><h3>Current master — sample</h3><div class="spacer"></div><span class="badge b-pending">1,204 tasks</span></div>
+      <div class="grid-wrap"><table><thead><tr><th>Site ID-JC</th><th>Task date</th><th>Old/New</th><th>Contractor</th><th>Conflict</th></tr></thead>
+      <tbody>${sample.map(r=>`<tr><td class="site num">${r[0]}</td><td class="num">${r[1]}</td><td>${periodBadge(r[2].toLowerCase())}</td><td>${contractorBadge(r[3])}</td><td>${r[4]?`<span class="flag">⚠ ${r[4]}</span>`:''}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+function adminConfigInner(){
+  return `<div class="two">
+      <div class="card"><div class="card-head"><h3>Coordinators</h3><div class="spacer"></div><span class="badge b-pending">auto-detected</span></div><div class="card-body">
+        <div class="taglist">${coordinators().map(c=>`<span class="tag">${c}</span>`).join('')}</div>
+        <div class="note" style="margin-top:12px">Detected from the trips data. To add one, add his name to the Google Form's coordinator dropdown — his page appears on his first submission.</div></div></div>
+      <div class="card"><div class="card-head"><h3>Contractors</h3></div><div class="card-body"><div class="taglist">${CONTRACTORS.map(c=>`<span class="tag">${c}</span>`).join('')}</div><div style="margin-top:14px"><button class="btn btn-ghost btn-sm">+ Add contractor</button></div></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><div class="card-head"><h3>Settings</h3></div><div class="card-body"><div class="kv">
+      <div class="k">Fiscal new-from year</div><div><input type="text" value="2026" style="max-width:110px"> <span style="color:var(--muted);font-size:12px">— fallback for unknown sites only</span></div>
+      <div class="k">Period source</div><div><span class="badge b-inhouse">Master's Old/New wins</span> <span style="color:var(--muted);font-size:12px">derive only when a site isn't in the master</span></div>
+      <div class="k">Export default</div><div><span class="badge b-pending">Weekly</span></div>
+      <div class="k">Admin password</div><div><input type="password" value="••••••" style="max-width:140px"> <span style="color:var(--muted);font-size:12px">guards master upload + config only</span></div>
+    </div><div style="margin-top:16px"><button class="btn btn-primary" onclick="toast('Config saved (prototype)')">Save</button></div></div></div>`;
+}
+function wireAdmin(){
+  if(!state.adminUnlocked){const u=$('#unlock');u&&(u.onclick=()=>{state.adminUnlocked=true;toast('Unlocked');render();});return;}
+  const tabs=$('#atabs');if(tabs)tabs.querySelectorAll('button').forEach(b=>b.onclick=()=>{tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));$('#ainner').innerHTML=b.dataset.atab==='config'?adminConfigInner():adminMasterInner([['K4429-ABD01','07-Dec-2025','Old','In-House',''],['R2551-MG1369','01-Oct-2025','Old','LM+',''],['6365-MW841','04-Oct-2025','New','In-House','both periods'],['D0079-MK940','01-Oct-2025','New','In-House','']]);});
+}
+
+/* ---------- Boot ---------- */
+renderSidebar();
+go('coord:'+coordinators()[0]);
+</script>
+</body>
+</html>
