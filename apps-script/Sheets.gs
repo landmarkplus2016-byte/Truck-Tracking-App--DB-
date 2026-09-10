@@ -129,6 +129,26 @@ function replaceObjects(name, objects) {
   }
 }
 
+/**
+ * Writes whole row objects (as readObjects returns them) back to their own rows (obj._row),
+ * one write per run of adjacent rows. Call under the script lock, on objects read in it.
+ */
+function updateObjects(name, objects) {
+  if (!objects.length) return;
+  const t = openTable_(name);
+  const sorted = objects.slice().sort(function (a, b) { return a._row - b._row; });
+  let run = [sorted[0]];
+  for (let i = 1; i <= sorted.length; i++) {
+    const next = sorted[i];
+    if (next && next._row === run[run.length - 1]._row + 1) {
+      run.push(next);
+      continue;
+    }
+    writeObjectsAt_(t, run[0]._row, run);
+    run = next ? [next] : [];
+  }
+}
+
 /** One write of objects starting at startRow, growing the sheet first if it is too short. */
 function writeObjectsAt_(t, startRow, objects) {
   const values = objects.map(function (o) {

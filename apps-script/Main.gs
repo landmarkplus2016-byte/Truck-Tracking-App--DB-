@@ -16,6 +16,11 @@ const ACTIONS = {
   list_coordinators: function () { return listCoordinators_(); },
   get_sitelookup: function () { return getSiteLookup_(); },
 
+  // Coordinator — open
+  list_lines: function (payload) { return listLines_(payload); },
+  save_line_classification: function (payload) { return saveLineClassification_(payload); },
+  approve_lines_coord: function (payload) { return approveLinesCoord_(payload); },
+
   // Admin — password-gated
   check_admin_pw: function (payload) { return checkAdminPw_(payload); },
   upload_sitelookup: function (payload) { return uploadSiteLookup_(payload); },

@@ -53,6 +53,7 @@
   --danger-border: #f4b4b4;
   --row-warn-bg: #fffdf5;
   --toast-ok: #7ee2a8;
+  --backdrop: rgba(15, 25, 66, .35);
 
   /* Period: Old = amber, New = blue */
   --old-bg: #fef3c7;

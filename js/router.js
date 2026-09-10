@@ -9,6 +9,7 @@ import { t } from './i18n/i18n.js';
 import { esc } from './utils/dom.js';
 import { icon } from './components/icons.js';
 import { renderAdmin } from './admin/adminGate.js';
+import { renderCoordinatorPage } from './coordinator/page.js';
 
 export const paths = {
   coordinator: (name) => '/coordinator/' + encodeURIComponent(name),
@@ -26,7 +27,7 @@ const ROUTES = [
     path: (p) => paths.coordinator(p.name),
     title: (p) => p.name,
     sub: (p) => t('page_coordinator_sub', { name: p.name }),
-    render: renderPlaceholder,
+    render: renderCoordinatorPage,
   },
   { pattern: /^\/trips$/, title: () => t('page_trips_title'), sub: () => t('page_trips_sub'), render: renderPlaceholder },
   { pattern: /^\/pm\/approvals$/, title: () => t('page_approvals_title'), sub: () => t('page_approvals_sub'), render: renderPlaceholder },
