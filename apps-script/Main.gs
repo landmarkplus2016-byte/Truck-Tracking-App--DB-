@@ -14,6 +14,7 @@
 const ACTIONS = {
   get_config: function (payload) { return getConfig_(payload); },
   list_coordinators: function () { return listCoordinators_(); },
+  get_sitelookup: function () { return getSiteLookup_(); },
 };
 
 function doPost(e) {

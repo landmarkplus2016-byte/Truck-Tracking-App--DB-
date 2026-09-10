@@ -118,12 +118,17 @@ function toMoney_(value) {
 // Any change here must be made identically in explode.js (CLAUDE.md §6.3):
 // the client preview and the server must agree to the pound.
 
-/** A '/'-joined site list → trimmed, upper-cased site ids, blanks dropped. Order kept. */
+/** How a site id is compared everywhere: Latin digits, trimmed, upper-case. */
+function normalizeSiteId(value) {
+  return toLatinDigits_(value === null || value === undefined ? '' : value).trim().toUpperCase();
+}
+
+/** A '/'-joined site list (or an array) → normalised site ids, blanks dropped. Order kept. */
 function parseSites(sites) {
   if (Array.isArray(sites)) sites = sites.join('/');
   return String(sites === null || sites === undefined ? '' : sites)
     .split('/')
-    .map(function (s) { return toLatinDigits_(s).trim().toUpperCase(); })
+    .map(normalizeSiteId)
     .filter(Boolean);
 }
 
