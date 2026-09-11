@@ -7,6 +7,7 @@ export default {
   // Brand
   app_name: 'Trucks Tracking',
   brand_sub: 'LMP · Telecom',
+  brand_logo_alt: 'Landmark Plus — a subsidiary of Landmark Group',
 
   // Sidebar
   nav_label: 'Main navigation',

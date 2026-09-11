@@ -96,4 +96,5 @@
   /* Type & layout */
   --font: 'Segoe UI', system-ui, -apple-system, 'Tahoma', sans-serif;
   --sidebar-w: 246px;
+  --bg-image-opacity: .3; /* background photo at 70% transparency */
 }

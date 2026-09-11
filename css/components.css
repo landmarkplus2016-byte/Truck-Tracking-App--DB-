@@ -5,6 +5,7 @@
  */
 
 /* ---------- Brand ---------- */
+.brand-logo { display: block; width: 100%; max-width: 200px; height: auto; margin-inline: auto; padding: 2px 6px 0; }
 .brand { display: flex; align-items: center; gap: 11px; padding: 4px 6px; }
 .brand .mark {
   width: 34px;

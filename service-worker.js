@@ -15,7 +15,7 @@
  * works online (it is fetched), it just isn't cached.
  */
 
-const APP_VERSION = '2026.09.11-1'; // YYYY.MM.DD-n — bump on every push
+const APP_VERSION = '2026.09.11-2'; // YYYY.MM.DD-n — bump on every push
 const CACHE_PREFIX = 'tt-shell-';
 const CACHE = CACHE_PREFIX + APP_VERSION;
 
@@ -26,6 +26,8 @@ const SHELL = [
   'icons/icon-512.png',
   'icons/maskable-512.png',
   'icons/apple-touch-icon.png',
+  'assets/lmp-logo-white.png',
+  'assets/app-background.jpg',
   'css/tokens.css',
   'css/base.css',
   'css/components.css',

@@ -65,7 +65,18 @@ input[type=checkbox] {
   gap: 20px;
   overflow-y: auto;
 }
-.main { display: flex; flex-direction: column; min-width: 0; }
+.main { display: flex; flex-direction: column; min-width: 0; position: relative; isolation: isolate; }
+/* Faded photo behind the content area only; fixed so it stays put while pages scroll */
+.main::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  inset-inline-start: var(--sidebar-w);
+  background: url('../assets/app-background.jpg') center / cover no-repeat;
+  opacity: var(--bg-image-opacity);
+  z-index: -1;
+  pointer-events: none;
+}
 .topbar {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -85,6 +96,7 @@ input[type=checkbox] {
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; }
   .sidebar { display: none; }
+  .main::before { inset-inline-start: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
