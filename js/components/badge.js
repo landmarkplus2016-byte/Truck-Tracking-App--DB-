@@ -27,6 +27,19 @@ export function contractorBadge(name) {
   return `<span class="badge ${isInHouse(label) ? 'b-inhouse' : 'b-contractor'}" dir="auto">${esc(label)}</span>`;
 }
 
+// A line's warn code → [label key, tooltip key]. Amber, and never blocks anything.
+export const WARN_KEYS = {
+  unknown_site: ['warn_unknown_site', 'warn_unknown_site_tip'],
+  conflict: ['warn_conflict', 'warn_conflict_tip'],
+  missing_job_code: ['warn_missing_job_code', 'warn_missing_job_code_tip'],
+};
+
+/** The amber flag for a line's warn code; '' when there is nothing to flag. */
+export function lineWarnFlag(warn) {
+  const keys = WARN_KEYS[warn];
+  return keys ? warnFlag(t(keys[0]), t(keys[1])) : '';
+}
+
 export function warnFlag(text, title = '') {
   const tip = title ? ` title="${esc(title)}"` : '';
   return `<span class="flag"${tip}>⚠ <span dir="auto">${esc(text)}</span></span>`;

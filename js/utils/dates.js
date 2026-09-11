@@ -49,6 +49,18 @@ export function isoWeek(value) {
   return `${dt.getUTCFullYear()}-W${pad2(week)}`;
 }
 
+/** 'YYYY-Www' → { start: Monday, end: Sunday } as ISO dates, or null if it isn't an ISO week. */
+export function isoWeekBounds(week) {
+  const m = /^(\d{4})-W(\d{2})$/.exec(String(week || ''));
+  if (!m) return null;
+  const jan4 = new Date(Date.UTC(Number(m[1]), 0, 4)); // 4 January is always in week 1
+  const monday = new Date(jan4);
+  monday.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() || 7) - 1) + (Number(m[2]) - 1) * 7);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  return { start: monday.toISOString().slice(0, 10), end: sunday.toISOString().slice(0, 10) };
+}
+
 /** Calendar year of a date, or 0 if it can't be read. */
 export function yearOf(value) {
   const iso = parseTypedDate(value);

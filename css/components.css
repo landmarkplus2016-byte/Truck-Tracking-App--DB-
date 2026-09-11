@@ -368,6 +368,25 @@
 .modal h3 { margin: 0 0 8px; font-size: 16px; }
 .modal p { margin: 0 0 18px; color: var(--text-2); line-height: 1.55; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.modal-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin: 0 0 4px 2px; }
+.modal textarea {
+  width: 100%;
+  padding: 8px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+  margin-bottom: 14px;
+}
+.modal textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
+.modal .form-error { margin-top: -6px; }
+
+/* ---------- PM approvals ---------- */
+.filters .push-end { align-self: flex-end; }
+.row-actions { white-space: nowrap; text-align: end; }
+.row-actions .btn + .btn { margin-inline-start: 6px; }
 
 /* ---------- Toast ---------- */
 .toast.toast-error { background: var(--danger); }

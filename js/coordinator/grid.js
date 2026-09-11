@@ -12,16 +12,12 @@ import { t } from '../i18n/i18n.js';
 import { esc } from '../utils/dom.js';
 import { formatMoney } from '../utils/money.js';
 import { isManual } from '../utils/resolve.js';
-import { periodBadge, isInHouse, warnFlag } from '../components/badge.js';
+import { periodBadge, isInHouse, warnFlag, lineWarnFlag, WARN_KEYS } from '../components/badge.js';
 import { isOpen, isApproved, isLocked } from './autofill.js';
 
 const EMPTY = '—';
 const HEAD_COLUMNS = ['site_id', 'job_code', 'route', 'contractor', 'period', 'cost', 'status'];
-const WARNINGS = {
-  unknown_site: ['warn_unknown_site', 'warn_unknown_site_tip'],
-  conflict: ['warn_conflict', 'warn_conflict_tip'],
-  missing_job_code: ['warn_missing_job_code', 'warn_missing_job_code_tip'],
-};
+const WARNINGS = WARN_KEYS;
 const MANUAL_FLAG = { job_code: 'jc_manual', contractor: 'contractor_manual', period: 'period_manual' };
 
 /* ---------- Render ---------- */
@@ -156,8 +152,7 @@ function statusHtml(line) {
 }
 
 function warnHtml(line) {
-  const labels = WARNINGS[line.warn];
-  return labels ? warnFlag(t(labels[0]), t(labels[1])) : '';
+  return lineWarnFlag(line.warn);
 }
 
 /* ---------- Patch in place ---------- */

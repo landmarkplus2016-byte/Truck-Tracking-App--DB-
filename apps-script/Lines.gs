@@ -28,14 +28,20 @@ const MAX_KEYS_PER_CALL = 2000;
 
 /* ---------- Read ---------- */
 
-/** list_lines — every line (for one coordinator when given), by date, trip, then site order. */
+/**
+ * list_lines {coordinator?, statuses?} — every line, by date, trip, then site order.
+ * coordinator narrows to one coordinator's page; statuses (e.g. ['coord_approved']) to the
+ * lines the PM pages need, so they don't carry the whole history.
+ */
 function listLines_(payload) {
   const coordinator = cleanText_(payload.coordinator);
+  const statuses = Array.isArray(payload.statuses) ? payload.statuses.map(cleanText_) : null;
   return readObjects(SHEET.LINES)
     .filter(function (r) {
       return cleanText_(r.line_key) !== '' && (!coordinator || cleanText_(r.coordinator) === coordinator);
     })
     .map(publicLine_)
+    .filter(function (line) { return !statuses || statuses.indexOf(line.status) !== -1; })
     .sort(compareLines_);
 }
 
