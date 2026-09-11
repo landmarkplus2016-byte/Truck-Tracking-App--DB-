@@ -1,11 +1,12 @@
 /**
- * i18n.js — t(key, vars). English only for now; ar.js is added to DICTIONARIES
- * later and nothing else changes (CLAUDE.md §9.1).
+ * i18n.js — t(key, vars). English only for now; ar.js is stubbed and registered,
+ * so Arabic is a matter of filling it in and switching `lang` (CLAUDE.md §9.1).
  */
 
 import en from './en.js';
+import ar from './ar.js';
 
-const DICTIONARIES = { en };
+const DICTIONARIES = { en, ar };
 let lang = 'en';
 const warned = new Set();
 

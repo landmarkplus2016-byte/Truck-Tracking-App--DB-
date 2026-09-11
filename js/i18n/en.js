@@ -52,6 +52,12 @@ export default {
   setup_hint: 'Ask the project owner for the URL.',
   setup_invalid_url: 'That is not an Apps Script Web App URL. It should start with https://script.google.com/ and end with /exec.',
 
+  // App updates
+  update_available: 'A new version of Trucks Tracking is available.',
+  update_reload: 'Reload',
+  update_reload_tip: 'Reloads the app on the new version — save any open edits first',
+  update_later: 'Later',
+
   // Shared
   action_retry: 'Retry',
   period_old: 'Old',
@@ -363,6 +369,7 @@ export default {
   error_unknown_action: 'The server does not support this yet — deploy a new version of the Apps Script.',
   error_not_configured: 'The Apps Script is missing its SPREADSHEET_ID setting.',
   error_missing_sheet: 'The database workbook is missing a tab ({detail}).',
+  error_unknown_column: 'The database workbook is missing a column ({detail}).',
   error_busy: 'Another save is in progress. Try again in a moment.',
   error_bad_request: 'The server rejected the request.',
   error_server_error: 'Unexpected server error.',

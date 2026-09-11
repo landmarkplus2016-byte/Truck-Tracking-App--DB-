@@ -482,6 +482,28 @@
 .export-preview .cost-cell { text-align: end; white-space: nowrap; }
 .export-preview .file-total td { font-weight: 800; color: var(--text); }
 
+/* ---------- New-version prompt (updates.js) ---------- */
+.update-bar {
+  position: fixed;
+  inset-inline-end: 20px;
+  bottom: 20px;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: calc(100vw - 40px);
+  padding: 10px 12px 10px 16px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid var(--primary);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* ---------- Toast ---------- */
 .toast.toast-error { background: var(--danger); }
 .toast {

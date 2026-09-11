@@ -11,6 +11,7 @@ import { $, esc } from './utils/dom.js';
 import { icon } from './components/icons.js';
 import { renderSidebar, markActiveNav } from './components/sidebar.js';
 import { startRouter, paths } from './router.js';
+import { startUpdates } from './updates.js';
 
 const els = {
   sidebar: $('#sidebar'),
@@ -23,6 +24,8 @@ let routerStarted = false;
 boot();
 
 function boot() {
+  setThemeColor();
+  startUpdates();
   renderSidebar(els.sidebar, { coordinators: [] });
   if (api.hasScriptUrl()) connect();
   else showSetup();
@@ -60,6 +63,16 @@ function startApp() {
       markActiveNav(els.sidebar, path);
     },
   });
+}
+
+/** The browser/OS title-bar colour, read from the --navy token so no hex lives in the HTML (rule 29). */
+function setThemeColor() {
+  const color = getComputedStyle(document.documentElement).getPropertyValue('--navy').trim();
+  if (!color) return;
+  const meta = document.createElement('meta');
+  meta.name = 'theme-color';
+  meta.content = color;
+  document.head.appendChild(meta);
 }
 
 function setHead(title, sub) {
