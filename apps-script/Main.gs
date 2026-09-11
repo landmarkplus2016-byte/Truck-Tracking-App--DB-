@@ -16,6 +16,10 @@ const ACTIONS = {
   list_coordinators: function () { return listCoordinators_(); },
   get_sitelookup: function () { return getSiteLookup_(); },
 
+  // Trips by day — open
+  list_trips_by_day: function (payload) { return listTripsByDay_(payload); },
+  save_trip: function (payload) { return saveTrip_(payload); },
+
   // Coordinator — open
   list_lines: function (payload) { return listLines_(payload); },
   save_line_classification: function (payload) { return saveLineClassification_(payload); },

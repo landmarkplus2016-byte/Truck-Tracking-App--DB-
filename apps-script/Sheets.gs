@@ -149,6 +149,27 @@ function updateObjects(name, objects) {
   }
 }
 
+/**
+ * Deletes the given sheet rows, bottom-up and one call per run of adjacent rows, so the
+ * row numbers still to be deleted never move. Row numbers read before this are stale after.
+ */
+function deleteRows(name, rowNumbers) {
+  if (!rowNumbers.length) return;
+  const t = openTable_(name);
+  const rows = rowNumbers.slice().sort(function (a, b) { return b - a; });
+  let i = 0;
+  while (i < rows.length) {
+    let start = rows[i];
+    let count = 1;
+    while (i + count < rows.length && rows[i + count] === start - 1) {
+      start--;
+      count++;
+    }
+    t.sheet.deleteRows(start, count);
+    i += count;
+  }
+}
+
 /** One write of objects starting at startRow, growing the sheet first if it is too short. */
 function writeObjectsAt_(t, startRow, objects) {
   const values = objects.map(function (o) {
