@@ -95,6 +95,46 @@ function pad2_(n) {
   return (n < 10 ? '0' : '') + n;
 }
 
+/* ---------- Date scope — a week or a date range (dashboard, export) ---------- */
+
+const SCOPE_MODES = ['week', 'range'];
+const ISO_WEEK_RE = /^\d{4}-W\d{2}$/;
+
+/**
+ * {mode: 'week' | 'range', week?, from?, to?} → a checked scope {mode, week, from, to}.
+ * No mode → week. A week scope with no week takes defaultWeek, else the current week.
+ * A range needs both dates; reversed ends are swapped. Anything else is bad_request.
+ */
+function parseScope_(asked, defaultWeek, tz) {
+  const given = asked && typeof asked === 'object' ? asked : {};
+  const mode = cleanText_(given.mode) || 'week';
+  if (SCOPE_MODES.indexOf(mode) === -1) throw appError_('bad_request', 'Unknown range: ' + mode);
+  const scope = { mode: mode, week: '', from: '', to: '' };
+  if (mode === 'week') {
+    scope.week = cleanText_(given.week);
+    if (scope.week && !ISO_WEEK_RE.test(scope.week)) throw appError_('bad_request', 'Not an ISO week: ' + scope.week);
+    if (!scope.week) scope.week = defaultWeek || isoWeek_(toIsoDate_(new Date(), tz));
+  } else {
+    const from = toIsoDate_(given.from, tz);
+    const to = toIsoDate_(given.to, tz);
+    if (!from || !to) throw appError_('bad_request', 'A date range needs a from and a to date');
+    scope.from = from <= to ? from : to;
+    scope.to = from <= to ? to : from;
+  }
+  return scope;
+}
+
+/** Whether an ISO date falls inside a parsed scope. */
+function inScope_(scope, isoDate) {
+  if (!isoDate) return false;
+  return scope.mode === 'week' ? isoWeek_(isoDate) === scope.week : isoDate >= scope.from && isoDate <= scope.to;
+}
+
+/** A scope as one line of text, for ExportLog. */
+function scopeText_(scope) {
+  return scope.mode === 'week' ? scope.week : scope.from + ' to ' + scope.to;
+}
+
 /* ---------- Text & money ---------- */
 
 /** Arabic-Indic (٠-٩) and Persian (۰-۹) digits → 0-9, so typed numbers parse. */

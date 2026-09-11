@@ -30,6 +30,10 @@ const ACTIONS = {
   return_lines: function (payload) { return returnLines_(payload); },
   dashboard_query: function (payload) { return dashboardQuery_(payload); },
 
+  // Export — open to run, atomic to commit
+  export_query: function (payload) { return exportQuery_(payload); },
+  export_commit: function (payload) { return exportCommit_(payload); },
+
   // Admin — password-gated
   check_admin_pw: function (payload) { return checkAdminPw_(payload); },
   upload_sitelookup: function (payload) { return uploadSiteLookup_(payload); },

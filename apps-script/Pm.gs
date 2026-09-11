@@ -77,9 +77,6 @@ function returnLines_(payload) {
 
 /* ---------- Dashboard ---------- */
 
-const DASHBOARD_MODES = ['week', 'range'];
-const ISO_WEEK_RE = /^\d{4}-W\d{2}$/;
-
 /**
  * dashboard_query {scope} — the PM dashboard's figures (CLAUDE.md §8, rule 24).
  *
@@ -104,15 +101,17 @@ function dashboardQuery_(payload) {
   const trips = readObjects(SHEET.TRIPS)
     .map(function (t) { return dashboardTrip_(t, tz); })
     .filter(function (t) { return t.trip_id && t.date; });
-  const scope = dashboardScope_(asked, trips, tz);
+  const latestWeek = trips.reduce(function (latest, t) { return t.week > latest ? t.week : latest; }, '');
+  const scope = parseScope_(asked, latestWeek, tz);
+  scope.coordinator = cleanText_(asked.coordinator);
+  scope.driver = typeof asked.driver === 'string' ? asked.driver : ''; // exact typed string (rule 22)
 
   const weeks = distinct_(trips.map(function (t) { return t.week; })).sort().reverse();
   const coordinators = distinct_(trips.map(function (t) { return t.coordinator; })).sort(byName_);
   if (coordinators.indexOf(scope.coordinator) === -1) scope.coordinator = '';
 
   const coordTrips = trips.filter(function (t) {
-    const inDates = scope.mode === 'week' ? t.week === scope.week : t.date >= scope.from && t.date <= scope.to;
-    return inDates && (!scope.coordinator || t.coordinator === scope.coordinator);
+    return inScope_(scope, t.date) && (!scope.coordinator || t.coordinator === scope.coordinator);
   });
   const drivers = distinct_(coordTrips.map(function (t) { return t.driver; })).sort(byName_);
   if (drivers.indexOf(scope.driver) === -1) scope.driver = '';
@@ -136,8 +135,7 @@ function dashboardQuery_(payload) {
 
   // Totals from the lines of those trips. Contractor names group case-insensitively,
   // shown with the Config spelling when the contractor is listed there.
-  const canonical = {};
-  (getConfig_().contractors || []).forEach(function (name) { canonical[name.toLowerCase()] = name; });
+  const canonical = contractorNames_();
   const contractorRows = {};
   let total = 0;
   let lineCount = 0;
@@ -164,35 +162,6 @@ function dashboardQuery_(payload) {
     by_coordinator: breakdownList_(coordRows, true),
     by_contractor: breakdownList_(contractorRows, false),
   };
-}
-
-/** The scope asked for, validated. Coordinator and driver are checked against the options later. */
-function dashboardScope_(asked, trips, tz) {
-  const mode = cleanText_(asked.mode) || 'week';
-  if (DASHBOARD_MODES.indexOf(mode) === -1) throw appError_('bad_request', 'Unknown dashboard range: ' + mode);
-  const scope = {
-    mode: mode,
-    week: '',
-    from: '',
-    to: '',
-    coordinator: cleanText_(asked.coordinator),
-    driver: typeof asked.driver === 'string' ? asked.driver : '', // exact typed string (rule 22)
-  };
-  if (mode === 'week') {
-    scope.week = cleanText_(asked.week);
-    if (scope.week && !ISO_WEEK_RE.test(scope.week)) throw appError_('bad_request', 'Not an ISO week: ' + scope.week);
-    if (!scope.week) {
-      scope.week = trips.reduce(function (latest, t) { return t.week > latest ? t.week : latest; }, '')
-        || isoWeek_(toIsoDate_(new Date(), tz));
-    }
-  } else {
-    const from = toIsoDate_(asked.from, tz);
-    const to = toIsoDate_(asked.to, tz);
-    if (!from || !to) throw appError_('bad_request', 'A date range needs a from and a to date');
-    scope.from = from <= to ? from : to;
-    scope.to = from <= to ? to : from;
-  }
-  return scope;
 }
 
 /** A Trips row → the trip-level figures the dashboard slices on. */

@@ -1,10 +1,11 @@
 /**
- * xlsx.js — thin wrappers over the xlsx-js-style global (XLSX) pinned in index.html.
- * Reading a workbook and a plain download live here now; the styled finance sheets
- * (CLAUDE.md §7.2) are added in Stage 10.
+ * xlsx.js — thin wrappers over the xlsx-js-style global (XLSX) pinned in index.html:
+ * reading a workbook, and writing one with cell styles (fonts, fills, borders, number
+ * formats), which the free SheetJS build would drop on write.
  */
 
 const MAX_SERIAL = 2958465; // 9999-12-31
+const MAX_SHEET_NAME = 31;
 
 function lib() {
   const X = globalThis.XLSX;
@@ -55,20 +56,67 @@ export function excelSerialToIso(serial, date1904 = false) {
 }
 
 /**
- * Builds and downloads a workbook. sheets: [{ name, rows, widths? }] where rows are
+ * A design token (a CSS custom property from tokens.css) → 'RRGGBB' for a cell style, or ''
+ * when it isn't a hex colour. Sheet colours come from here, so no hex lives outside tokens.css.
+ */
+export function tokenRgb(name) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  let m = /^#([0-9a-f]{6})$/i.exec(value);
+  if (m) return m[1].toUpperCase();
+  m = /^#([0-9a-f]{3})$/i.exec(value);
+  return m ? m[1].split('').map((c) => c + c).join('').toUpperCase() : '';
+}
+
+/**
+ * sheets: [{ name, rows, merges?, cols? }] → a workbook. Each row is an array of cells: a plain
+ * value, or { v, s } with an xlsx-js-style style s (font, fill, border, alignment, numFmt).
+ * merges: [[firstRow, firstCol, lastRow, lastCol]] (0-based). cols: character widths.
+ */
+export function buildWorkbook(sheets) {
+  const X = lib();
+  const wb = X.utils.book_new();
+  sheets.forEach(({ name, rows, merges, cols }) => {
+    const values = rows.map((row) => row.map((cell) => {
+      const v = isStyledCell(cell) ? cell.v : cell;
+      return v === null || v === undefined ? '' : v;
+    }));
+    const ws = X.utils.aoa_to_sheet(values);
+    rows.forEach((row, r) => row.forEach((cell, c) => {
+      if (!isStyledCell(cell) || !cell.s) return;
+      const ref = X.utils.encode_cell({ r, c });
+      if (ws[ref]) ws[ref].s = cell.s;
+    }));
+    if (merges && merges.length) {
+      ws['!merges'] = merges.map(([r1, c1, r2, c2]) => ({ s: { r: r1, c: c1 }, e: { r: r2, c: c2 } }));
+    }
+    if (cols) ws['!cols'] = cols.map((wch) => ({ wch }));
+    X.utils.book_append_sheet(wb, ws, safeSheetName(name));
+  });
+  return wb;
+}
+
+/** Saves a workbook as a download. */
+export function saveWorkbook(wb, fileName) {
+  lib().writeFile(wb, fileName);
+}
+
+/**
+ * Builds and downloads a plain workbook. sheets: [{ name, rows, widths? }] where rows are
  * arrays of cell values and rows[0] is the header (written bold).
  */
 export function downloadWorkbook(fileName, sheets) {
-  const X = lib();
-  const wb = X.utils.book_new();
-  sheets.forEach(({ name, rows, widths }) => {
-    const ws = X.utils.aoa_to_sheet(rows);
-    (rows[0] || []).forEach((_, c) => {
-      const cell = ws[X.utils.encode_cell({ r: 0, c })];
-      if (cell) cell.s = { font: { bold: true } };
-    });
-    if (widths) ws['!cols'] = widths.map((wch) => ({ wch }));
-    X.utils.book_append_sheet(wb, ws, name);
-  });
-  X.writeFile(wb, fileName);
+  saveWorkbook(buildWorkbook(sheets.map(({ name, rows, widths }) => ({
+    name,
+    rows: rows.map((row, r) => (r === 0 ? row.map((v) => ({ v, s: { font: { bold: true } } })) : row)),
+    cols: widths,
+  }))), fileName);
+}
+
+function isStyledCell(cell) {
+  return cell !== null && typeof cell === 'object' && !(cell instanceof Date);
+}
+
+/** Excel's sheet-name rules: at most 31 characters, none of []:*?/\ */
+function safeSheetName(name) {
+  return String(name || '').replace(/[[\]:*?/\\]/g, ' ').trim().slice(0, MAX_SHEET_NAME) || 'Sheet1';
 }

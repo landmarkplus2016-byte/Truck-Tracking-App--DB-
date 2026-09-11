@@ -425,6 +425,63 @@
 .split-row .fill { height: 100%; border-radius: var(--r-pill); }
 .split-row .amt { width: 92px; flex: none; text-align: end; font-weight: 700; font-size: 13px; }
 
+/* ---------- PM export ---------- */
+.field-label { display: block; font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .2px; margin: 2px 0 7px 2px; }
+.export-hint { display: block; margin-top: 8px; }
+.chip-count { color: var(--muted); font-size: 11px; font-weight: 600; }
+.chip.excluded .chip-count { color: inherit; }
+.chip button:disabled { opacity: .4; cursor: default; }
+.btn svg { flex: none; }
+
+.export-body { margin-top: 16px; transition: opacity .12s; }
+.export-body.is-busy { opacity: .55; pointer-events: none; }
+.export-body .note, .export-body .warn-box { margin: 0; }
+
+.files { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 13px; }
+.file {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.file.active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
+.file.is-empty { opacity: .6; }
+.file .xl { display: flex; align-items: center; gap: 10px; }
+.file .ic {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--success-bg);
+  color: var(--success);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 12px;
+  flex: none;
+}
+.file .fname { font-weight: 700; font-size: 12.5px; word-break: break-all; line-height: 1.35; }
+.file .meta { font-size: 11.5px; color: var(--muted); }
+.file-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+
+.export-done {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+}
+.export-done svg { flex: none; margin-top: 1px; }
+.export-done h3 { margin: 0 0 4px; font-size: 14px; }
+.export-done p { margin: 0; color: var(--text-2); line-height: 1.5; }
+.export-preview .cost-cell { text-align: end; white-space: nowrap; }
+.export-preview .file-total td { font-weight: 800; color: var(--text); }
+
 /* ---------- Toast ---------- */
 .toast.toast-error { background: var(--danger); }
 .toast {

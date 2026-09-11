@@ -129,6 +129,13 @@ function writeConfigValues_(patch) {
   });
 }
 
+/** Config contractors by lower-cased name → their Config spelling, so 'el-khayal' groups as 'El-Khayal'. */
+function contractorNames_() {
+  const names = {};
+  (getConfig_().contractors || []).forEach(function (name) { names[name.toLowerCase()] = name; });
+  return names;
+}
+
 function parseJsonOr_(value, fallback) {
   if (value === '' || value === null || value === undefined) return fallback;
   try {
