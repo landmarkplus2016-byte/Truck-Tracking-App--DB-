@@ -7,6 +7,7 @@
 import { toLatinDigits } from './money.js';
 
 const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const DAY_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
 /**
  * A typed or stored date → 'YYYY-MM-DD', or '' if it can't be read.
@@ -59,6 +60,17 @@ export function isoWeekBounds(week) {
   const sunday = new Date(monday);
   sunday.setUTCDate(monday.getUTCDate() + 6);
   return { start: monday.toISOString().slice(0, 10), end: sunday.toISOString().slice(0, 10) };
+}
+
+/** 'YYYY-Www' → its Monday–Sunday span for display: '6–12 Oct', or '29 Sept – 5 Oct'. '' if it isn't an ISO week. */
+export function weekRangeText(week) {
+  const bounds = isoWeekBounds(week);
+  if (!bounds) return '';
+  const start = new Date(`${bounds.start}T00:00:00Z`);
+  const end = new Date(`${bounds.end}T00:00:00Z`);
+  return start.getUTCMonth() === end.getUTCMonth()
+    ? `${start.getUTCDate()}–${DAY_MONTH.format(end)}`
+    : `${DAY_MONTH.format(start)} – ${DAY_MONTH.format(end)}`;
 }
 
 /** Calendar year of a date, or 0 if it can't be read. */

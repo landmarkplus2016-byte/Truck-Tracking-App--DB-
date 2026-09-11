@@ -12,6 +12,7 @@ import { renderAdmin } from './admin/adminGate.js';
 import { renderCoordinatorPage } from './coordinator/page.js';
 import { renderTripsByDay } from './trips/tripsByDay.js';
 import { renderApprovals } from './pm/approvals.js';
+import { renderDashboard } from './pm/dashboard.js';
 
 export const paths = {
   coordinator: (name) => '/coordinator/' + encodeURIComponent(name),
@@ -33,7 +34,7 @@ const ROUTES = [
   },
   { pattern: /^\/trips$/, title: () => t('page_trips_title'), sub: () => t('page_trips_sub'), render: renderTripsByDay },
   { pattern: /^\/pm\/approvals$/, title: () => t('page_approvals_title'), sub: () => t('page_approvals_sub'), render: renderApprovals },
-  { pattern: /^\/pm\/dashboard$/, title: () => t('page_dashboard_title'), sub: () => t('page_dashboard_sub'), render: renderPlaceholder },
+  { pattern: /^\/pm\/dashboard$/, title: () => t('page_dashboard_title'), sub: () => t('page_dashboard_sub'), render: renderDashboard },
   { pattern: /^\/pm\/export$/, title: () => t('page_export_title'), sub: () => t('page_export_sub'), render: renderPlaceholder },
   { pattern: /^\/admin$/, title: () => t('page_admin_title'), sub: () => t('page_admin_sub'), render: renderAdmin },
 ];

@@ -116,6 +116,28 @@ export default {
   pm_return_placeholder: 'What needs fixing?',
   pm_return_confirm: 'Return',
 
+  // PM dashboard
+  dash_loading: 'Loading dashboard…',
+  dash_filter_range: 'Range',
+  dash_range_week: 'Week',
+  dash_range_dates: 'Date range',
+  dash_filter_from: 'From',
+  dash_filter_to: 'To',
+  dash_filter_driver: 'Driver',
+  dash_counts: 'Trips: {trips} · Site lines: {lines}',
+  dash_total_spend: 'Total spend',
+  dash_currency: 'EGP',
+  dash_by_contractor: 'By contractor',
+  dash_by_coordinator: 'By coordinator',
+  dash_total_only: 'total only',
+  dash_boundary_note: 'Component split (Labor / Truck / Hotel / Park) lives on the trip, so it slices by coordinator, week, date and driver — but not by contractor or Old/New, since one trip can straddle In-House and a contractor. Those two slice the totals.',
+  dash_unclassified: 'Unclassified',
+  dash_row_coordinator: '{trips} trip(s) · {lines} site line(s)',
+  dash_row_contractor: '{lines} site line(s)',
+  dash_no_lines: 'These trips have no site lines.',
+  dash_empty: 'No trips in this range.',
+  dash_mismatch: "The site lines add up to {lines} EGP but the trips' costs add up to {trips} EGP, so some trip's lines are out of step with its money. Open that trip on Trips by day and save it to re-split.",
+
   // Trips by day
   trips_day: 'Day',
   trips_prev_day: 'Previous day with trips',

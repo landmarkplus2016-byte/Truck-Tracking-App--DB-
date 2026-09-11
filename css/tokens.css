@@ -71,7 +71,14 @@
   --accent-labor: #0ea5e9;
   --accent-truck: #8b5cf6;
   --accent-hotel: #f59e0b;
+  --accent-park: #10b981;
   --bar-empty: #cbd0e6;
+  /* By-contractor bars (In-House uses --primary) */
+  --series-1: #8b5cf6;
+  --series-2: #0ea5e9;
+  --series-3: #f59e0b;
+  --series-4: #0d9488;
+  --series-5: #db2777;
 
   /* Shadows */
   --sh-sm: 0 1px 2px rgba(16, 24, 64, .05);

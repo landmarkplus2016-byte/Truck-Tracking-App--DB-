@@ -10,7 +10,7 @@
 import { api } from '../api.js';
 import { t, errorText } from '../i18n/i18n.js';
 import { $, esc } from '../utils/dom.js';
-import { isoWeek, isoWeekBounds } from '../utils/dates.js';
+import { isoWeek, weekRangeText } from '../utils/dates.js';
 import { formatMoney } from '../utils/money.js';
 import { normalizePeriod } from '../utils/resolve.js';
 import { periodBadge, contractorBadge, lineWarnFlag } from '../components/badge.js';
@@ -25,7 +25,6 @@ const LISTED = ['coord_approved', 'pm_approved'];
 const VIEWS = { awaiting: ['coord_approved'], approved: ['pm_approved'], all: LISTED };
 const COLUMNS = ['pm_col_date', 'pm_col_coordinator', 'pm_col_site', 'grid_col_job_code', 'pm_col_driver',
   'grid_col_cost', 'grid_col_period', 'grid_col_contractor', 'grid_col_status'];
-const DAY_MONTH = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
 // The PM's filters, kept while the tab is open.
 const filters = { week: '', coordinator: '', period: '', view: 'awaiting' };
@@ -267,14 +266,8 @@ function statusHtml(line) {
 
 /** '2025-W41' → '2025-W41 (6–12 Oct)'. */
 function weekLabel(week) {
-  const bounds = isoWeekBounds(week);
-  if (!bounds) return week;
-  const start = new Date(`${bounds.start}T00:00:00Z`);
-  const end = new Date(`${bounds.end}T00:00:00Z`);
-  const range = start.getUTCMonth() === end.getUTCMonth()
-    ? `${start.getUTCDate()}–${DAY_MONTH.format(end)}`
-    : `${DAY_MONTH.format(start)} – ${DAY_MONTH.format(end)}`;
-  return t('pm_week_option', { week, range });
+  const range = weekRangeText(week);
+  return range ? t('pm_week_option', { week, range }) : week;
 }
 
 function unique(values) {

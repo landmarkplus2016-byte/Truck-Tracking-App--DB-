@@ -28,6 +28,7 @@ const ACTIONS = {
   // PM — open
   approve_lines_pm: function (payload) { return approveLinesPm_(payload); },
   return_lines: function (payload) { return returnLines_(payload); },
+  dashboard_query: function (payload) { return dashboardQuery_(payload); },
 
   // Admin — password-gated
   check_admin_pw: function (payload) { return checkAdminPw_(payload); },
