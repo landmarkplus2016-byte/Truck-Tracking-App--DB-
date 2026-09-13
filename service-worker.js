@@ -15,7 +15,7 @@
  * works online (it is fetched), it just isn't cached.
  */
 
-const APP_VERSION = '2026.09.11-2'; // YYYY.MM.DD-n — bump on every push
+const APP_VERSION = '2026.09.13-1'; // YYYY.MM.DD-n — bump on every push
 const CACHE_PREFIX = 'tt-shell-';
 const CACHE = CACHE_PREFIX + APP_VERSION;
 
